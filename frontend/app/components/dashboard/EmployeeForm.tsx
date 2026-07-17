@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/app/context/authContext";
 
 interface Manager {
     _id: string;
@@ -49,6 +50,8 @@ export default function EmployeeForm({
         }));
     };
 
+    const { user } = useAuth();
+    console.log("-___________________________", user)
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -176,7 +179,8 @@ export default function EmployeeForm({
                     >
                         <option value="EMPLOYEE">Employee</option>
                         <option value="HR_MANAGER">HR Manager</option>
-                        <option value="SUPER_ADMIN">Super Admin</option>
+                        {user?.role == "SUPER_ADMIN" ? <option value="SUPER_ADMIN">Super Admin</option> : ""}
+
                     </select>
                 </div>
 
@@ -192,15 +196,18 @@ export default function EmployeeForm({
                             className="mt-2 w-full rounded-lg bg-slate-800 border border-slate-700 px-4 py-3"
                         >
                             <option value="">Select Manager</option>
-
-                            {managers.map((manager) => (
-                                <option
-                                    key={manager._id}
-                                    value={manager._id}
-                                >
-                                    {manager.name} ({manager.role})
-                                </option>
-                            ))}
+                            {
+                                managers
+                                    .filter((manager) => manager.role !== "SUPER_ADMIN")
+                                    .map((manager) => (
+                                        <option
+                                            key={manager._id}
+                                            value={manager._id}
+                                        >
+                                            {manager.name} ({manager.role})
+                                        </option>
+                                    ))
+                            }
                         </select>
                     </div>
                 )}

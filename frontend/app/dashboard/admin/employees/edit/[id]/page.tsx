@@ -101,7 +101,7 @@ export default function EditEmployeePage() {
 
             alert("Employee Updated Successfully");
 
-            router.push("/admin/employees");
+            router.push("/dashboard/admin/employees");
         } catch (err: any) {
             console.log(err);
 

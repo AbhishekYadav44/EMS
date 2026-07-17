@@ -1,31 +1,29 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import {
     createContext,
     useContext,
     useState,
-    ReactNode
+    ReactNode,
+    useEffect
 } from "react";
 
 
 interface User {
-
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-
+    id:string;
+    name:string;
+    email:string;
+    role:string;
 }
 
 
 interface AuthContextType {
 
-    user: User | null;
-    login: (token: string, user: User) => void;
-    logout: () => void;
+    user:User | null;
+    login:(token:string,user:User)=>void;
+    logout:()=>void;
 
 }
-
 
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -34,16 +32,34 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({
     children
-}: {
-    children: ReactNode
-}) => {
+}:{
+    children:ReactNode
+})=>{
 
 
-    const [user, setUser] = useState<User | null>(null);
+    const [user,setUser] = useState<User | null>(null);
+
+
+const router = useRouter()
+    // load user after refresh/navigation
+    useEffect(()=>{
+
+        const savedUser = localStorage.getItem("user");
+
+        if(savedUser){
+
+            setUser(JSON.parse(savedUser));
+
+        }
+
+    },[]);
 
 
 
-    const login = (token: string, user: User) => {
+    const login = (
+        token:string,
+        user:User
+    )=>{
 
 
         localStorage.setItem(
@@ -60,19 +76,20 @@ export const AuthProvider = ({
 
         setUser(user);
 
-    }
+    };
 
 
 
-
-    const logout = () => {
+    const logout = ()=>{
 
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        
 
         setUser(null);
+        router.push("/")
 
-    }
+    };
 
 
 
@@ -92,16 +109,16 @@ export const AuthProvider = ({
 
     )
 
-
 }
 
 
 
-export const useAuth = () => {
+export const useAuth = ()=>{
 
     const context = useContext(AuthContext);
 
-    if (!context)
+
+    if(!context)
         throw new Error("Auth provider missing");
 
 

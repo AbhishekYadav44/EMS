@@ -39,7 +39,7 @@ px-6
 
                     logout();
 
-                    router.push("/login");
+                    
 
                 }}
 

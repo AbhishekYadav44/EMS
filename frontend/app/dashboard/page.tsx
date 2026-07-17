@@ -11,37 +11,32 @@ export default function Dashboard() {
 
     useEffect(() => {
 
-        const user = JSON.parse(
-            localStorage.getItem("user") || "{}"
-        );
+        const storedUser = localStorage.getItem("user");
 
-
-        if (!user.role) {
+        if (!storedUser) {
             router.push("/login");
             return;
         }
 
 
-        switch (user.role) {
-
-            case "SUPER_ADMIN":
-                router.push("/dashboard/admin");
-                break;
+        const user = JSON.parse(storedUser);
 
 
-            case "HR_MANAGER":
-                router.push("/dashboard/hr");
-                break;
+        console.log("DASHBOARD ROLE:", user.role);
 
 
-            default:
-                router.push("/dashboard/employee");
-
+        if (user.role === "SUPER_ADMIN") {
+            router.replace("/dashboard/admin");
+        }
+        else if (user.role === "HR_MANAGER") {
+            router.replace("/dashboard/manager");
+        }
+        else {
+            router.replace("/dashboard/employee");
         }
 
 
-
-    }, []);
+    }, [router]);
 
 
 

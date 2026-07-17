@@ -73,7 +73,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-white">
-
+      
       <Sidebar />
 
       <div className="flex-1">

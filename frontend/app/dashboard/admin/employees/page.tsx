@@ -13,127 +13,152 @@ import { getEmployees, deleteEmployee } from "@/app/services/employee";
 import { Employee } from "../../../types/employees";
 
 export default function EmployeesPage() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-  const [search, setSearch] = useState("");
-  const [department, setDepartment] = useState("");
-  const [role, setRole] = useState("");
+    const [search, setSearch] = useState("");
+    const [department, setDepartment] = useState("");
+    const [role, setRole] = useState("");
 
-  useEffect(() => {
-    fetchEmployees();
-  }, [page, search, department, role]);
+    useEffect(() => {
+        fetchEmployees();
+    }, [page, search, department, role]);
 
-  const fetchEmployees = async () => {
-    try {
-      setLoading(true);
+    const fetchEmployees = async () => {
+        try {
+            setLoading(true);
 
-      const data = await getEmployees(
-        page,
-        search,
-        department,
-        role
-      );
+            const data = await getEmployees(
+                page,
+                search,
+                department,
+                role
+            );
 
-      setEmployees(data.employees);
-      setTotalPages(data.totalPages);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+            setEmployees(data.employees);
+            setTotalPages(data.totalPages);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleDelete = async (id: string) => {
-    const ok = window.confirm(
-      "Delete this employee?"
-    );
+    const handleDelete = async (id: string) => {
 
-    if (!ok) return;
+        const ok = window.confirm(
+            "Delete this employee?"
+        );
 
-    try {
-      await deleteEmployee(id);
+        if (!ok) return;
 
-      fetchEmployees();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        if(role !== "SUPER_AMDIN"){
+            alert("you cannot delete users!");
+            return;
+        }
 
-  const handleEdit = (id: string) => {
-    router.push(`/admin/employees/edit/${id}`);
-  };
 
-  return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
+        try {
 
-      <Sidebar />
+            const res = await deleteEmployee(id);
 
-      <div className="flex-1">
+            if (res.success) {
 
-        <Navbar />
+                alert("Employee deleted successfully");
 
-        <main className="p-8">
+                fetchEmployees();
 
-          <div className="flex justify-between items-center mb-8">
+            } else {
 
-            <div>
+                alert(res.message);
 
-              <h1 className="text-3xl font-bold">
-                Employees
-              </h1>
+            }
 
-              <p className="text-slate-400 mt-2">
-                Manage all employees in your organization.
-              </p>
+
+        } catch (err: any) {
+
+            alert(
+                err.response?.data?.message ||
+                "Something went wrong"
+            );
+
+        }
+    };
+    const handleEdit = (id: string) => {
+        console.log("edit handler")
+        router.push(`/dashboard/admin/employees/edit/${id}`);
+    };
+
+    return (
+        <div className="flex min-h-screen bg-slate-950 text-white">
+
+            <Sidebar />
+
+            <div className="flex-1">
+
+                <Navbar />
+
+                <main className="p-8">
+
+                    <div className="flex justify-between items-center mb-8">
+
+                        <div>
+
+                            <h1 className="text-3xl font-bold">
+                                Employees
+                            </h1>
+
+                            <p className="text-slate-400 mt-2">
+                                Manage all employees in your organization.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <SearchBar
+                        search={search}
+                        department={department}
+                        role={role}
+                        onSearchChange={(value) => {
+                            setPage(1);
+                            setSearch(value);
+                        }}
+                        onDepartmentChange={(value) => {
+                            setPage(1);
+                            setDepartment(value);
+                        }}
+                        onRoleChange={(value) => {
+                            setPage(1);
+                            setRole(value);
+                        }}
+                        onAddEmployee={() =>
+                            router.push("/dashboard/admin/employees/add")
+                        }
+                    />
+
+                    <EmployeeTable
+                        employees={employees}
+                        loading={loading}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                    />
+
+                </main>
 
             </div>
 
-          </div>
-
-          <SearchBar
-            search={search}
-            department={department}
-            role={role}
-            onSearchChange={(value) => {
-              setPage(1);
-              setSearch(value);
-            }}
-            onDepartmentChange={(value) => {
-              setPage(1);
-              setDepartment(value);
-            }}
-            onRoleChange={(value) => {
-              setPage(1);
-              setRole(value);
-            }}
-            onAddEmployee={() =>
-              router.push("/admin/employees/add")
-            }
-          />
-
-          <EmployeeTable
-            employees={employees}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-
-        </main>
-
-      </div>
-
-    </div>
-  );
+        </div>
+    );
 }

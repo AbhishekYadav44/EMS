@@ -115,7 +115,7 @@ export default function EmployeeTable({
                                         Delete
                                     </button>
                                     <Link
-                                        href={`/admin/employees/reportees/${employee._id}`}
+                                        href={`/dashboard/admin/employees/reportees/${employee._id}`}
                                         className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-700 text-sm"
                                     >
                                         Reportees

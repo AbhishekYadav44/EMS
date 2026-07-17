@@ -1,23 +1,26 @@
 "use client";
 
-
 import Link from "next/link";
+import { useAuth } from "@/app/context/authContext";
 
 
 export default function Sidebar() {
+
+    const { user } = useAuth();
+    console.log("______________",user?.role)
 
 
     return (
 
         <aside
             className="
-w-64
-bg-slate-900
-min-h-screen
-p-5
-"
+            w-64
+            bg-slate-900
+            min-h-screen
+            p-5
+            text-white
+            "
         >
-
 
             <h2 className="text-lg font-bold mb-6">
                 Menu
@@ -37,7 +40,7 @@ p-5
 
 
                 <Link
-                    href="/dashboard/profile"
+                    href="/dashboard/employee/profile"
                     className="block hover:text-blue-400"
                 >
                     Profile
@@ -45,12 +48,18 @@ p-5
 
 
 
-                <Link
-                    href="/dashboard/employees"
-                    className="block hover:text-blue-400"
-                >
-                    Employees
-                </Link>
+                {
+                    user?.role !== "EMPLOYEE" && (
+
+                        <Link
+                            href="/dashboard/admin/employees"
+                            className="block hover:text-blue-400"
+                        >
+                            Employees
+                        </Link>
+
+                    )
+                }
 
 
             </nav>
@@ -58,7 +67,5 @@ p-5
 
         </aside>
 
-    )
-
-
+    );
 }

@@ -23,7 +23,7 @@ export default function AddEmployeePage() {
 
       alert("Employee Created Successfully");
 
-      router.push("/admin/employees");
+      router.push("/dashboard/admin/employees");
     } catch (error: any) {
       console.log(error);
 

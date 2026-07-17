@@ -45,8 +45,16 @@ export const assignManager = async (req: Request, res: Response) => {
             _id: id,
             isDeleted: false
         }).select("-password -__v")
-        const manager = await User.findById({ managerId, isDeleted: false });
-        if (!manager) return
+        const manager = await User.findOne({
+            _id: managerId,
+            isDeleted: false,
+        });
+        if (!manager || manager.isDeleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Manager not found"
+            });
+        }
 
         if (
             manager.role !== UserRole.SUPER_ADMIN &&
